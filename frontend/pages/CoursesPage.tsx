@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import backend from "~backend/client";
 import { CourseCard } from "@/components/courses/CourseCard";
 import { BookOpen, Loader2 } from "lucide-react";
@@ -7,10 +9,17 @@ import { useLanguage } from "@/hooks/useLanguage";
 
 export function CoursesPage() {
   const { t } = useLanguage();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { data, isLoading } = useQuery({
     queryKey: ["courses"],
     queryFn: () => backend.courses.list(),
   });
+
+  useEffect(() => {
+    if (searchParams.has("selectedCourse")) {
+      setSearchParams({});
+    }
+  }, [searchParams, setSearchParams]);
 
   return (
     <div className="min-h-screen pt-20 pb-16">

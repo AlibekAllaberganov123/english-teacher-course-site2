@@ -49,14 +49,9 @@ export function CourseModal({ course, isOpen, onClose }: CourseModalProps) {
     mutationFn: (data: { courseId: number; paymentMethod: string }) =>
       backend.student.enrollCourse(data),
     onSuccess: () => {
-      toast({
-        title: "Muvaffaqiyatli!",
-        description: "Siz kursga yozildingiz. Dashboard sahifasiga yo'naltirilmoqda...",
-      });
-      setTimeout(() => {
-        navigate("/dashboard");
-        onClose();
-      }, 1500);
+      const courseTitle = language === "uz" ? course.titleUz : course.title;
+      navigate(`/payment-success?course=${encodeURIComponent(courseTitle)}`);
+      onClose();
     },
     onError: (error) => {
       console.error(error);
@@ -65,16 +60,19 @@ export function CourseModal({ course, isOpen, onClose }: CourseModalProps) {
         description: "Kursga yozilishda xatolik yuz berdi.",
         variant: "destructive",
       });
+      navigate("/payment-cancel");
+      onClose();
     },
   });
 
   const handlePayment = (method: string) => {
     if (!isSignedIn) {
+      onClose();
       toast({
         title: "Tizimga kiring",
         description: "Kursni sotib olish uchun tizimga kirishingiz kerak.",
       });
-      navigate("/login");
+      navigate(`/login?returnUrl=/courses&selectedCourse=${course.id}&paymentMethod=${method}`);
       return;
     }
     setSelectedPayment(method);

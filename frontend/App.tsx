@@ -16,6 +16,8 @@ import { LoginPage } from "@/pages/LoginPage";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { AdminPage } from "@/pages/AdminPage";
 import { TeacherPage } from "@/pages/TeacherPage";
+import { PaymentSuccessPage } from "@/pages/PaymentSuccessPage";
+import { PaymentCancelPage } from "@/pages/PaymentCancelPage";
 
 const queryClient = new QueryClient();
 const PUBLISHABLE_KEY = "pk_test_aW5mb3JtZWQtbXVsZS04NS5jbGVyay5hY2NvdW50cy5kZXYk";
@@ -50,6 +52,8 @@ export default function App() {
                 />
                 <Route path="/admin" element={<AdminPage />} />
                 <Route path="/teacher" element={<TeacherPage />} />
+                <Route path="/payment-success" element={<PaymentSuccessPage />} />
+                <Route path="/payment-cancel" element={<PaymentCancelPage />} />
               </Routes>
               <Footer />
               <WhatsAppButton />

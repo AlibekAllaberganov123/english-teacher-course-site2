@@ -1,7 +1,21 @@
 import { SignIn } from "@clerk/clerk-react";
 import { motion } from "framer-motion";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
+import { useAuth } from "@clerk/clerk-react";
 
 export function LoginPage() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { isSignedIn } = useAuth();
+  const returnUrl = searchParams.get("returnUrl") || "/dashboard";
+
+  useEffect(() => {
+    if (isSignedIn) {
+      navigate(returnUrl);
+    }
+  }, [isSignedIn, navigate, returnUrl]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-50 to-blue-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center pt-20 px-4">
       <motion.div
@@ -24,7 +38,7 @@ export function LoginPage() {
             routing="path"
             path="/login"
             signUpUrl="/login"
-            afterSignInUrl="/dashboard"
+            afterSignInUrl={returnUrl}
             appearance={{
               elements: {
                 rootBox: "w-full",
