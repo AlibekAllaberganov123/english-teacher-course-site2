@@ -102,7 +102,9 @@ export interface ClientOptions {
 /**
  * Import the endpoint handlers to derive the types for the client.
  */
+import { addCourse as api_admin_add_course_addCourse } from "~backend/admin/add_course";
 import { addHomework as api_admin_add_homework_addHomework } from "~backend/admin/add_homework";
+import { addLesson as api_admin_add_lesson_addLesson } from "~backend/admin/add_lesson";
 import { addVideo as api_admin_add_video_addVideo } from "~backend/admin/add_video";
 import { getStats as api_admin_get_stats_getStats } from "~backend/admin/get_stats";
 import { getStudents as api_admin_get_students_getStudents } from "~backend/admin/get_students";
@@ -115,17 +117,31 @@ export namespace admin {
 
         constructor(baseClient: BaseClient) {
             this.baseClient = baseClient
+            this.addCourse = this.addCourse.bind(this)
             this.addHomework = this.addHomework.bind(this)
+            this.addLesson = this.addLesson.bind(this)
             this.addVideo = this.addVideo.bind(this)
             this.getStats = this.getStats.bind(this)
             this.getStudents = this.getStudents.bind(this)
             this.login = this.login.bind(this)
         }
 
+        public async addCourse(params: RequestType<typeof api_admin_add_course_addCourse>): Promise<ResponseType<typeof api_admin_add_course_addCourse>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/admin/course`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_admin_add_course_addCourse>
+        }
+
         public async addHomework(params: RequestType<typeof api_admin_add_homework_addHomework>): Promise<ResponseType<typeof api_admin_add_homework_addHomework>> {
             // Now make the actual call to the API
             const resp = await this.baseClient.callTypedAPI(`/admin/homework`, {method: "POST", body: JSON.stringify(params)})
             return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_admin_add_homework_addHomework>
+        }
+
+        public async addLesson(params: RequestType<typeof api_admin_add_lesson_addLesson>): Promise<ResponseType<typeof api_admin_add_lesson_addLesson>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/admin/lesson`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_admin_add_lesson_addLesson>
         }
 
         public async addVideo(params: RequestType<typeof api_admin_add_video_addVideo>): Promise<ResponseType<typeof api_admin_add_video_addVideo>> {

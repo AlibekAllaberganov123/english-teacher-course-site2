@@ -15,6 +15,7 @@ import { ContactPage } from "@/pages/ContactPage";
 import { LoginPage } from "@/pages/LoginPage";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { AdminPage } from "@/pages/AdminPage";
+import { TeacherPage } from "@/pages/TeacherPage";
 
 const queryClient = new QueryClient();
 const PUBLISHABLE_KEY = "pk_test_aW5mb3JtZWQtbXVsZS04NS5jbGVyay5hY2NvdW50cy5kZXYk";
@@ -48,6 +49,7 @@ export default function App() {
                   }
                 />
                 <Route path="/admin" element={<AdminPage />} />
+                <Route path="/teacher" element={<TeacherPage />} />
               </Routes>
               <Footer />
               <WhatsAppButton />

@@ -24,6 +24,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { CourseModal } from "@/components/admin/CourseModal";
+import { LessonModal } from "@/components/admin/LessonModal";
 
 export function AdminPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -31,6 +33,8 @@ export function AdminPage() {
   const [password, setPassword] = useState("");
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [showHomeworkModal, setShowHomeworkModal] = useState(false);
+  const [showCourseModal, setShowCourseModal] = useState(false);
+  const [showLessonModal, setShowLessonModal] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -231,23 +235,41 @@ export function AdminPage() {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <Button
             onClick={() => setShowVideoModal(true)}
             size="lg"
-            className="gap-2 h-16"
+            className="gap-2 h-14"
           >
             <Video className="w-5 h-5" />
-            Yangi video dars qo'shish
+            Yangi video qo'shish
           </Button>
           <Button
             onClick={() => setShowHomeworkModal(true)}
             size="lg"
             variant="outline"
-            className="gap-2 h-16"
+            className="gap-2 h-14"
           >
             <FileText className="w-5 h-5" />
-            Yangi uy vazifa qo'shish
+            Yangi uy vazifa
+          </Button>
+          <Button
+            onClick={() => setShowCourseModal(true)}
+            size="lg"
+            variant="outline"
+            className="gap-2 h-14"
+          >
+            <Plus className="w-5 h-5" />
+            Yangi kurs
+          </Button>
+          <Button
+            onClick={() => setShowLessonModal(true)}
+            size="lg"
+            variant="outline"
+            className="gap-2 h-14"
+          >
+            <Plus className="w-5 h-5" />
+            Yangi lesson
           </Button>
         </div>
 
@@ -323,6 +345,15 @@ export function AdminPage() {
           onClose={() => setShowHomeworkModal(false)}
           courses={courses || []}
           onSubmit={(data) => addHomeworkMutation.mutate(data)}
+        />
+        <CourseModal
+          isOpen={showCourseModal}
+          onClose={() => setShowCourseModal(false)}
+        />
+        <LessonModal
+          isOpen={showLessonModal}
+          onClose={() => setShowLessonModal(false)}
+          courses={courses || []}
         />
       </div>
     </div>
@@ -466,9 +497,33 @@ function HomeworkModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.courseId || formData.courseId === 0) {
+      alert("Iltimos, kursni tanlang!");
+      return;
+    }
+    if (!formData.title || !formData.titleUz) {
+      alert("Iltimos, sarlavhalarni to'ldiring!");
+      return;
+    }
+    if (!formData.description || !formData.descriptionUz) {
+      alert("Iltimos, tavsiflarni to'ldiring!");
+      return;
+    }
+    if (!formData.deadline) {
+      alert("Iltimos, muddatni belgilang!");
+      return;
+    }
     onSubmit({
       ...formData,
-      deadline: formData.deadline ? new Date(formData.deadline) : undefined,
+      deadline: new Date(formData.deadline),
+    });
+    setFormData({
+      courseId: 0,
+      title: "",
+      titleUz: "",
+      description: "",
+      descriptionUz: "",
+      deadline: "",
     });
   };
 
@@ -480,7 +535,7 @@ function HomeworkModal({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label>Kurs</Label>
+            <Label>Kurs *</Label>
             <select
               className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
               value={formData.courseId}
@@ -489,9 +544,9 @@ function HomeworkModal({
               }
               required
             >
-              <option value={0}>Kursni tanlang</option>
-              {courses.map((course) => (
-                <option key={course.id} value={course.id}>
+              <option value="">Kursni tanlang</option>
+              {courses.map((course, index) => (
+                <option key={index} value={index + 1}>
                   {course.titleUz}
                 </option>
               ))}
@@ -499,54 +554,59 @@ function HomeworkModal({
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label>Sarlavha (English)</Label>
+              <Label>Sarlavha (English) *</Label>
               <Input
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                placeholder="Unit 1: Introduction"
                 required
               />
             </div>
             <div>
-              <Label>Sarlavha (Uzbek)</Label>
+              <Label>Sarlavha (Uzbek) *</Label>
               <Input
                 value={formData.titleUz}
                 onChange={(e) =>
                   setFormData({ ...formData, titleUz: e.target.value })
                 }
+                placeholder="1-bo'lim: Kirish"
                 required
               />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label>Tavsif (English)</Label>
+              <Label>Tavsif (English) *</Label>
               <Textarea
                 value={formData.description}
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
+                placeholder="Complete exercises 1-5..."
                 required
               />
             </div>
             <div>
-              <Label>Tavsif (Uzbek)</Label>
+              <Label>Tavsif (Uzbek) *</Label>
               <Textarea
                 value={formData.descriptionUz}
                 onChange={(e) =>
                   setFormData({ ...formData, descriptionUz: e.target.value })
                 }
+                placeholder="1-5 mashqlarni bajaring..."
                 required
               />
             </div>
           </div>
           <div>
-            <Label>Muddat</Label>
+            <Label>Muddat *</Label>
             <Input
               type="date"
               value={formData.deadline}
               onChange={(e) =>
                 setFormData({ ...formData, deadline: e.target.value })
               }
+              required
             />
           </div>
           <Button type="submit" className="w-full">
