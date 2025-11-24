@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/hooks/useLanguage";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
@@ -19,7 +20,7 @@ export function Navigation() {
   ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-slate-950/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors duration-300">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           <Link to="/" className="flex items-center gap-3">
@@ -27,8 +28,8 @@ export function Navigation() {
               <span className="text-white font-bold text-xl">A</span>
             </div>
             <div className="hidden sm:block">
-              <div className="font-bold text-slate-900">Alibek Allaberganov</div>
-              <div className="text-xs text-slate-600">English Teacher</div>
+              <div className="font-bold text-slate-900 dark:text-white">Alibek Allaberganov</div>
+              <div className="text-xs text-slate-600 dark:text-slate-400">English Teacher</div>
             </div>
           </Link>
 
@@ -39,15 +40,15 @@ export function Navigation() {
                 to={item.path}
                 className={`text-sm font-medium transition-colors relative ${
                   location.pathname === item.path
-                    ? "text-sky-600"
-                    : "text-slate-600 hover:text-slate-900"
+                    ? "text-sky-600 dark:text-sky-400"
+                    : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
                 }`}
               >
                 {item.labelUz}
                 {location.pathname === item.path && (
                   <motion.div
                     layoutId="activeNav"
-                    className="absolute -bottom-6 left-0 right-0 h-0.5 bg-sky-600"
+                    className="absolute -bottom-6 left-0 right-0 h-0.5 bg-sky-600 dark:bg-sky-400"
                   />
                 )}
               </Link>
@@ -55,6 +56,7 @@ export function Navigation() {
           </div>
 
           <div className="flex items-center gap-4">
+            <ThemeToggle />
             <Button
               variant="ghost"
               size="sm"
@@ -67,7 +69,7 @@ export function Navigation() {
 
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="md:hidden p-2 text-slate-600 hover:text-slate-900"
+              className="md:hidden p-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
             >
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -81,7 +83,7 @@ export function Navigation() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden border-t border-slate-200 bg-white"
+            className="md:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950"
           >
             <div className="container mx-auto px-4 py-4 space-y-2">
               {navItems.map((item) => (
@@ -91,8 +93,8 @@ export function Navigation() {
                   onClick={() => setIsOpen(false)}
                   className={`block px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
                     location.pathname === item.path
-                      ? "bg-sky-50 text-sky-600"
-                      : "text-slate-600 hover:bg-slate-50"
+                      ? "bg-sky-50 dark:bg-sky-950 text-sky-600 dark:text-sky-400"
+                      : "text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900"
                   }`}
                 >
                   {item.labelUz}

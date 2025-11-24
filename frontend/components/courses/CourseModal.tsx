@@ -9,6 +9,12 @@ import { Button } from "@/components/ui/button";
 import { Check, CreditCard, Smartphone } from "lucide-react";
 import type { Course } from "~backend/courses/list";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useBackend } from "@/hooks/useBackend";
+import { useMutation } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
+import { useState } from "react";
+import { useAuth } from "@clerk/clerk-react";
 
 interface CourseModalProps {
   course: Course;
@@ -18,6 +24,11 @@ interface CourseModalProps {
 
 export function CourseModal({ course, isOpen, onClose }: CourseModalProps) {
   const { language } = useLanguage();
+  const backend = useBackend();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const { isSignedIn } = useAuth();
+  const [selectedPayment, setSelectedPayment] = useState<string | null>(null);
 
   const title = language === "uz" ? course.titleUz : course.title;
   const description = language === "uz" ? course.descriptionUz : course.description;
@@ -28,11 +39,48 @@ export function CourseModal({ course, isOpen, onClose }: CourseModalProps) {
   };
 
   const paymentMethods = [
-    { name: "Click", icon: Smartphone },
-    { name: "Payme", icon: Smartphone },
-    { name: "Uzcard", icon: CreditCard },
-    { name: "Payze", icon: CreditCard },
+    { name: "Click", icon: Smartphone, url: "https://click.uz" },
+    { name: "Payme", icon: Smartphone, url: "https://payme.uz" },
+    { name: "Uzcard", icon: CreditCard, url: "#" },
+    { name: "Payze", icon: CreditCard, url: "#" },
   ];
+
+  const enrollMutation = useMutation({
+    mutationFn: (data: { courseId: number; paymentMethod: string }) =>
+      backend.student.enrollCourse(data),
+    onSuccess: () => {
+      toast({
+        title: "Muvaffaqiyatli!",
+        description: "Siz kursga yozildingiz. Dashboard sahifasiga yo'naltirilmoqda...",
+      });
+      setTimeout(() => {
+        navigate("/dashboard");
+        onClose();
+      }, 1500);
+    },
+    onError: (error) => {
+      console.error(error);
+      toast({
+        title: "Xatolik",
+        description: "Kursga yozilishda xatolik yuz berdi.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handlePayment = (method: string) => {
+    if (!isSignedIn) {
+      toast({
+        title: "Tizimga kiring",
+        description: "Kursni sotib olish uchun tizimga kirishingiz kerak.",
+      });
+      navigate("/login");
+      return;
+    }
+    setSelectedPayment(method);
+    const courseId = typeof course.id === 'string' ? parseInt(course.id.split('-')[0]) || 1 : course.id;
+    enrollMutation.mutate({ courseId, paymentMethod: method });
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -106,8 +154,10 @@ export function CourseModal({ course, isOpen, onClose }: CourseModalProps) {
                 {paymentMethods.map((method) => (
                   <Button
                     key={method.name}
-                    variant="outline"
+                    variant={selectedPayment === method.name ? "default" : "outline"}
                     className="h-auto py-4 gap-2"
+                    onClick={() => handlePayment(method.name)}
+                    disabled={enrollMutation.isPending}
                   >
                     <method.icon className="w-5 h-5" />
                     {method.name}
@@ -116,12 +166,12 @@ export function CourseModal({ course, isOpen, onClose }: CourseModalProps) {
               </div>
             </div>
 
-            <p className="text-xs text-slate-500 text-center mb-4">
-              To'lov tizimi integratsiyasi tez orada qo'shiladi. Hozircha, iltimos, biz bilan bog'laning.
+            <p className="text-xs text-slate-500 dark:text-slate-400 text-center mb-4">
+              💳 To'lovdan so'ng avtomatik ravishda dashboard sahifasiga yo'naltirilasiz
             </p>
 
-            <Button className="w-full" size="lg" onClick={onClose}>
-              Biz bilan bog'laning
+            <Button className="w-full" size="lg" onClick={onClose} variant="outline">
+              Yopish
             </Button>
           </div>
         </div>

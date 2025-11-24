@@ -4,6 +4,7 @@
   "type": "module",
   "packageManager": "bun",
   "dependencies": {
+    "@clerk/clerk-react": "^5.35.2",
     "@radix-ui/react-dialog": "^1.1.14",
     "@radix-ui/react-label": "^2.1.2",
     "@radix-ui/react-select": "^2.2.5",
@@ -15,6 +16,7 @@
     "clsx": "^2.1.1",
     "encore.dev": "^1.51.6",
     "framer-motion": "^12.6.1",
+    "lottie-web": "^5.13.0",
     "lucide-react": "^0.484.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
