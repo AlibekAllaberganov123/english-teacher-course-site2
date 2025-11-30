@@ -8,9 +8,17 @@
   },
   "dependencies": {
     "@clerk/backend": "^1.27.0",
-    "encore.dev": "^1.51.6"
+    "encore.dev": "^1.51.6",
+    "@prisma/client": "^6.2.0",
+    "stripe": "^17.5.0",
+    "uploadthing": "^7.6.1"
   },
   "devDependencies": {
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "prisma": "^6.2.0",
+    "@types/node": "^22.0.0"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   }
 }

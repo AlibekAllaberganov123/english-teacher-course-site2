@@ -1,0 +1,142 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Course {
+  id          Int      @id @default(autoincrement())
+  title       String
+  titleUz     String
+  description String   @db.Text
+  descriptionUz String @db.Text
+  price       Int
+  duration    String
+  level       String
+  category    String
+  format      String   @default("online")
+  startDate   DateTime @default(now())
+  image       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  lessons     Lesson[]
+  homework    Homework[]
+  enrollments Enrollment[]
+
+  @@map("courses")
+}
+
+model Lesson {
+  id          Int      @id @default(autoincrement())
+  courseId    Int
+  title       String
+  titleUz     String
+  content     String   @db.Text
+  contentUz   String   @db.Text
+  orderIndex  Int      @default(0)
+  videoUrl    String?
+  duration    Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@map("lessons")
+}
+
+model Homework {
+  id          Int      @id @default(autoincrement())
+  courseId    Int
+  title       String
+  titleUz     String
+  description String   @db.Text
+  descriptionUz String @db.Text
+  deadline    DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  submissions HomeworkSubmission[]
+
+  @@map("homework")
+}
+
+model HomeworkSubmission {
+  id          Int      @id @default(autoincrement())
+  homeworkId  Int
+  userId      String
+  content     String   @db.Text
+  grade       Int?
+  feedback    String?  @db.Text
+  submittedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  homework    Homework @relation(fields: [homeworkId], references: [id], onDelete: Cascade)
+
+  @@unique([homeworkId, userId])
+  @@map("homework_submissions")
+}
+
+model Enrollment {
+  id            Int      @id @default(autoincrement())
+  userId        String
+  courseId      Int
+  paymentStatus String   @default("pending")
+  paymentMethod String?
+  stripeSessionId String?
+  enrolledAt    DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  course        Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@map("enrollments")
+}
+
+model UserProgress {
+  id                Int      @id @default(autoincrement())
+  userId            String
+  courseId          Int
+  completedVideos   Int      @default(0)
+  totalVideos       Int      @default(0)
+  completedHomework Int      @default(0)
+  totalHomework     Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([userId, courseId])
+  @@map("user_progress")
+}
+
+model Contact {
+  id              Int      @id @default(autoincrement())
+  name            String
+  phone           String
+  email           String?
+  courseInterest  String?
+  message         String?  @db.Text
+  userId          String?
+  createdAt       DateTime @default(now())
+
+  @@map("contacts")
+}
+
+model Testimonial {
+  id              Int      @id @default(autoincrement())
+  studentName     String
+  studentNameUz   String
+  course          String
+  rating          Int
+  beforeScore     String?
+  afterScore      String?
+  testimonial     String   @db.Text
+  testimonialUz   String   @db.Text
+  image           String?
+  createdAt       DateTime @default(now())
+
+  @@map("testimonials")
+}
